@@ -154,6 +154,7 @@ Este sistema foi projetado para rodar em servidores linux (Ubuntu e Debian).
 -   Composer
 -   Credenciais para senha única
 -   Acesso ao replicado (visão Pessoa - VUps, Estrutura - VUes e Financeiro - VUfi)
+-   Skin da unidade no laravel-usp-theme, com o blade footer
 
 Bibliotecas necessárias do php:
 
