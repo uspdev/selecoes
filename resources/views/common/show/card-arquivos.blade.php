@@ -100,6 +100,9 @@
                         <a href="arquivos/{{ $arquivo->id }}" title="{{ $arquivo->nome_original }}" class="nome-arquivo-display"><i class="fas fa-file-pdf"></i>
                           <span>{{ $arquivo->nome_original }}</span>
                         </a>
+                        @if (($tipoarquivo['nome'] === 'Boleto(s) de Pagamento') && !empty($arquivo->situacao))
+                          &nbsp;({{ $arquivo->situacao }})
+                        @endif
                       </li>
                     @endif
                   @endforeach
