@@ -65,6 +65,7 @@ class BoletoService
                 $arquivo->caminho = $arquivo_caminho;
                 $arquivo->mimeType = 'application/pdf';
                 $arquivo->tipoarquivo_id = TipoArquivo::where('classe_nome', ClasseUtils::obterClasseNomePluralAcentuado($classe_nome))->where('nome', 'Boleto(s) de Pagamento')->first()->id;
+                $arquivo->extras = json_encode(['boleto' => ['id' => $id]]);
                 $arquivo->save();
                 $arquivo->{ ClasseUtils::obterClasseNomePlural($classe_nome) }()->attach($objeto->id, [
                     'tipo' => 'Boleto(s) de Pagamento',
@@ -91,6 +92,42 @@ class BoletoService
         } catch (Exception $e) {
             Log::info('Erro ao gerar boleto... $e->getMessage(): ' . $e->getMessage());
             return ['nome_original' => '', 'conteudo' => ''];
+        }
+    }
+
+    public function situacaoBoleto(int $arquivo_id)
+    {
+        $arquivo = Arquivo::find($arquivo_id);
+        $arquivo_extras = json_decode($arquivo?->extras, true);
+        $codigoIDBoleto = $arquivo_extras['boleto']['id'] ?? null;
+        if (is_null($codigoIDBoleto))
+            return '';
+
+        $boleto = new Boleto(config('selecoes.ws_boleto_usuario'), config('selecoes.ws_boleto_senha'));
+
+        try {
+            config('app.debug') && Log::info('Obtendo situação do boleto ' . $codigoIDBoleto . '...');
+
+            $situacao = $boleto->situacao($codigoIDBoleto);
+            if ($situacao['status'])
+                switch ($situacao['value']['situacao']) {
+                    case 'E':    // emitido
+                        return 'emitido';
+                    case 'P':    // pago
+                        return 'pago';
+                    case 'C':    // cancelado
+                        return 'cancelado';
+                    default:
+                        return '';
+                }
+            else {
+                Log::info('Erro ao obter situação do boleto... $situacao[\'value\']: ' . $situacao['value']);
+                return '';
+            }
+
+        } catch (Exception $e) {
+            Log::info('Erro ao obter situação do boleto... $e->getMessage(): ' . $e->getMessage());
+            return '';
         }
     }
 }

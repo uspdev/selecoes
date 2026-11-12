@@ -448,6 +448,8 @@ class InscricaoController extends Controller
                     $disciplinas_sem_boleto[] = $disciplina;
         $inscricao->disciplinas_sem_boleto = $disciplinas_sem_boleto;
         $boleto_momento_envio = $inscricao->selecao->vinculo->boleto_momento_envio;
+        foreach ($inscricao->arquivos as $arquivo)
+            $arquivo->situacao = ($arquivo->pivot->tipo === 'Boleto(s) de Pagamento' ? $this->boletoService->situacaoBoleto($arquivo->id) : null);
         $max_upload_size = config('selecoes.upload_max_filesize');
 
         return compact('data', 'objeto', 'classe_nome', 'classe_nome_plural', 'form', 'modo', 'objeto_disciplinas', 'disciplinas', 'nivel', 'tiposarquivo_selecao', 'solicitacaoisencaotaxa_aprovada', 'boleto_momento_envio', 'max_upload_size', 'scroll');
