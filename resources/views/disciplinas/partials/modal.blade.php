@@ -40,6 +40,26 @@
   <script type="text/javascript">
     $(document).ready(function() {
 
+      $('#sigla').attr({
+        'maxlength': 7,
+        'pattern': '[A-Z]{3}[0-9]{4}',
+        'title': 'Digite três letras maiúsculas seguidas de quatro números'
+      }).on('input', function() {
+        valor = $(this).val().toUpperCase();
+        novo_valor = '';
+        for (i = 0; i < valor.length && novo_valor.length < 7; i++) {
+          c = valor.charAt(i);
+          if (novo_valor.length < 3) {
+            if (/[A-Z]/.test(c))
+              novo_valor += c;
+          } else {
+            if (/[0-9]/.test(c))
+              novo_valor += c;
+          }
+        }
+        $(this).val(novo_valor);
+      });
+
       $('#modalForm').on('shown.bs.modal', function() {
         $(this).find(':input[type=text]').filter(':visible:first').focus();
       });
